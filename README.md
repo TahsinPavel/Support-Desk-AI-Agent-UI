@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Support Desk UI (Frontend)
 
-## Getting Started
+This is the official frontend for the AI Support Desk multi-tenant SaaS platform.
 
-First, run the development server:
+## Tech Stack
+- Next.js 14+
+- React
+- Tailwind CSS
+- shadcn/ui
+- TypeScript
 
-```bash
+## Project Structure
+ai_support_desk_ui/
+ ├── src/
+ │   ├── app/
+ │   ├── components/
+ │   ├── lib/
+ │   └── styles/
+ ├── public/
+ ├── package.json
+ ├── README.md
+ └── ...
+
+## Development
+To run the dev server:
+
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app runs at: http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
+Deploy on Vercel for best performance:
+- Push to GitHub
+- Import repository on Vercel
+- Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Backend Connection
+This UI connects to the backend API running at:
 
-## Learn More
+https://your-backend-domain.com/api
 
-To learn more about Next.js, take a look at the following resources:
+You can set this in:
+.env.local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+NEXT_PUBLIC_API_URL="http://localhost:8000"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+The UI includes:
+- Multi-tenant dashboard
+- Channel management (SMS, Email, Voice, Chat)
+- Tenant onboarding
+- AI conversation logs
+- User management
+- Settings pages
