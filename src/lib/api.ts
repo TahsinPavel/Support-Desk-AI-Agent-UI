@@ -16,6 +16,8 @@ export const AUTH_ENDPOINTS = {
 
 // SMS API endpoints
 export const SMS_ENDPOINTS = {
+  LIST: '/sms/messages',
+  SEND: '/sms/messages/send',
   RECEIVE: '/sms/receive',
   SUMMARY: '/analytics/sms/summary',
   DAILY: '/analytics/sms/daily',
@@ -24,7 +26,7 @@ export const SMS_ENDPOINTS = {
 
 // Email API endpoints
 export const EMAIL_ENDPOINTS = {
-  RECEIVE: '/email/receive',
+  RECEIVE: '/email/email/receive',
   SUMMARY: '/analytics/email/summary',
   DAILY: '/analytics/email/daily',
   TYPES: '/analytics/email/types',
@@ -32,6 +34,7 @@ export const EMAIL_ENDPOINTS = {
 
 // Voice API endpoints
 export const VOICE_ENDPOINTS = {
+  LOGS: '/voice/logs',
   RECEIVE: '/voice/receive',
   SUMMARY: '/analytics/voice/summary',
   DAILY: '/analytics/voice/daily',
@@ -48,6 +51,16 @@ export const CHAT_ENDPOINTS = {
 
 // Unified endpoints
 export const ANALYTICS_ENDPOINTS = {
+  BASIC: '/analytics/basic',
   RECENT_ACTIVITY: '/analytics/recent-activity',
   ASSISTANT_PERFORMANCE: '/analytics/assistant-performance',
+};
+
+// Appointments endpoints
+export const APPOINTMENTS_ENDPOINTS = {
+  LIST: '/appointments',
+  SUMMARY: '/appointments/summary',
+  CREATE: '/appointments',
+  UPDATE: (id: string) => `/appointments/${id}`,
+  DELETE: (id: string) => `/appointments/${id}`,
 };

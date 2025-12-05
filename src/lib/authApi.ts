@@ -14,8 +14,9 @@ export interface LoginData {
 }
 
 export interface AuthResponse {
-  success: boolean;
+  success?: boolean;
   message?: string;
+  detail?: string;
   user?: {
     id: string;
     name: string;
@@ -23,6 +24,8 @@ export interface AuthResponse {
     business_name: string;
   };
   token?: string;
+  access_token?: string;
+  accessToken?: string;
 }
 
 export interface UserProfile {
@@ -41,14 +44,19 @@ export const signup = async (data: SignupData): Promise<AuthResponse> => {
 // Authenticate and login
 export const login = async (data: LoginData): Promise<AuthResponse> => {
   const response = await axiosInstance.post(AUTH_ENDPOINTS.LOGIN, data);
-  
-  // Store token if returned
-  if (response.data.token) {
-    localStorage.setItem('auth_token', response.data.token);
+
+  console.log('Login response:', response.data); // Debug: see what backend returns
+
+  // Store token if returned (check common token field names)
+  const token = response.data.token || response.data.access_token || response.data.accessToken;
+  if (token) {
+    localStorage.setItem('auth_token', token);
+    // Set cookie for middleware authentication (expires in 7 days)
+    document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
     // Set the token in axios defaults for future requests
-    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
-  
+
   return response.data;
 };
 
@@ -60,9 +68,15 @@ export const getMe = async (): Promise<UserProfile> => {
 
 // Logout
 export const logout = async (): Promise<void> => {
-  await axiosInstance.post(AUTH_ENDPOINTS.LOGOUT);
+  try {
+    await axiosInstance.post(AUTH_ENDPOINTS.LOGOUT);
+  } catch (error) {
+    console.error('Logout API error:', error);
+  }
   // Clear stored token
   localStorage.removeItem('auth_token');
+  // Clear the auth cookie
+  document.cookie = 'auth-token=; path=/; max-age=0; SameSite=Lax';
   delete axiosInstance.defaults.headers.common['Authorization'];
 };
 

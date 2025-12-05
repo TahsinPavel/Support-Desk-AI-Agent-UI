@@ -23,6 +23,9 @@ interface RecentActivityTableProps {
 }
 
 export function RecentActivityTable({ data, isLoading = false }: RecentActivityTableProps) {
+  // Ensure data is an array
+  const safeData = Array.isArray(data) ? data : [];
+
   if (isLoading) {
     return (
       <motion.div
@@ -30,10 +33,10 @@ export function RecentActivityTable({ data, isLoading = false }: RecentActivityT
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card className="rounded-2xl shadow-sm">
-          <CardHeader>
+        <Card className="rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm bg-white dark:bg-neutral-900">
+          <CardHeader className="pb-3">
             <CardTitle>
-              <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-6 w-32 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse"></div>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -41,13 +44,13 @@ export function RecentActivityTable({ data, isLoading = false }: RecentActivityT
               {[1, 2, 3, 4, 5].map((item) => (
                 <div key={item} className="flex items-center justify-between py-2">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+                    <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-700 animate-pulse"></div>
                     <div>
-                      <div className="h-4 w-20 bg-gray-200 rounded animate-pulse mb-1"></div>
-                      <div className="h-3 w-24 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-4 w-20 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse mb-1"></div>
+                      <div className="h-3 w-24 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                     </div>
                   </div>
-                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-16 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                 </div>
               ))}
             </div>
@@ -105,42 +108,42 @@ export function RecentActivityTable({ data, isLoading = false }: RecentActivityT
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+      <Card className="rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm bg-white dark:bg-neutral-900">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-muted-foreground">
-                  <th className="pb-3 px-4">Type</th>
-                  <th className="pb-3 px-4">Contact</th>
-                  <th className="pb-3 px-4">Summary</th>
-                  <th className="pb-3 px-4">Timestamp</th>
-                  <th className="pb-3 px-4">Status</th>
+                <tr className="text-left border-b border-gray-200 dark:border-neutral-800">
+                  <th className="pb-3 px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                  <th className="pb-3 px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
+                  <th className="pb-3 px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Summary</th>
+                  <th className="pb-3 px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Timestamp</th>
+                  <th className="pb-3 px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
-              <tbody>
-                {data.map((activity) => (
-                  <tr key={activity.id} className="border-b">
+              <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
+                {safeData.map((activity) => (
+                  <tr key={activity.id} className="hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         {getTypeIcon(activity.type)}
-                        <span className="capitalize">{activity.type}</span>
+                        <span className="capitalize text-gray-700 dark:text-gray-300">{activity.type}</span>
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-medium">{activity.contact}</td>
-                    <td className="py-3 px-4 text-muted-foreground max-w-xs truncate">
+                    <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">{activity.contact}</td>
+                    <td className="py-3 px-4 text-gray-500 dark:text-gray-400 max-w-xs truncate">
                       {activity.summary}
                     </td>
-                    <td className="py-3 px-4 text-muted-foreground">
+                    <td className="py-3 px-4 text-gray-500 dark:text-gray-400 text-sm">
                       {formatTime(activity.timestamp)}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(activity.status)}
-                        <span className="capitalize">{activity.status}</span>
+                        <span className="capitalize text-gray-700 dark:text-gray-300">{activity.status}</span>
                       </div>
                     </td>
                   </tr>

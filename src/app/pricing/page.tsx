@@ -23,31 +23,13 @@ declare global {
 
 const pricingTiers: PricingTier[] = [
   {
-    name: "Starter AI",
-    description: "For small businesses (1–5 employees)",
-    price: 149,
-    yearlyPrice: 119,
-    icon: "starter",
-    resolutionCost: "$1.20 per AI resolution",
-    features: [
-      "AI Chat, Email, SMS & Voice agent",
-      "2 human agent seats",
-      "Basic analytics",
-      "1 knowledge base source",
-      "Mobile-friendly inbox",
-      "1 phone number connector",
-      "1 support email connector",
-      "Unlimited inbound messages",
-    ],
-  },
-  {
     name: "Growth AI",
-    description: "For mid-market teams (5–25 employees)",
-    price: 499,
-    yearlyPrice: 399,
+    description: "",
+    price: null,
+    yearlyPrice: null,
+    priceLabel: "Available Soon",
     icon: "growth",
-    popular: true,
-    resolutionCost: "$0.90 per AI resolution",
+    comingSoon: true,
     features: [
       "Everything in Starter",
       "5 human agent seats",
@@ -60,14 +42,32 @@ const pricingTiers: PricingTier[] = [
     ],
   },
   {
+    name: "Starter AI",
+    description: "",
+    price: 149,
+    yearlyPrice: 119,
+    icon: "starter",
+    popular: true,
+    features: [
+      "AI Chat, Email, SMS & Voice agent",
+      "2 human agent seats",
+      "Basic analytics",
+      "1 knowledge base source",
+      "Mobile-friendly inbox",
+      "1 phone number connector",
+      "1 support email connector",
+      "Unlimited inbound messages",
+    ],
+  },
+  {
     name: "Enterprise AI",
-    description: "For high-volume teams",
+    description: "",
     price: null,
     yearlyPrice: null,
-    priceLabel: "Custom Pricing",
+    priceLabel: "Available Soon",
     icon: "enterprise",
     enterprise: true,
-    resolutionCost: "$0.70 per AI resolution",
+    comingSoon: true,
     features: [
       "Everything in Growth",
       "Custom LLM (GPT-4o / Gemini / Claude)",
@@ -100,8 +100,8 @@ export default function PricingPage() {
       script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
       script.async = true;
       script.onload = () => {
-        if (typeof Paddle !== "undefined") {
-          Paddle("init", {
+        if (window.Paddle) {
+          window.Paddle.Initialize({
             token: "YOUR_PADDLE_CLIENT_TOKEN", // Replace with your token
             environment: "sandbox", // Change to "production" for live
           });

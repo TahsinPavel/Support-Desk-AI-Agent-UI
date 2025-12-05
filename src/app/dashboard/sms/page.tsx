@@ -1,266 +1,367 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageList } from "@/components/sms/MessageList";
 import { MessageThread } from "@/components/sms/MessageThread";
 import { NewMessageInput } from "@/components/sms/NewMessageInput";
+import { Loader2, AlertCircle, MessageSquare } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { ConversationSummary, SMSMessage } from "@/types/sms";
+import { ConversationSummary, SMSMessage, Conversation } from "@/types/sms";
 
 // Locale-agnostic timestamp formatting function to prevent hydration errors
-const formatRelativeTime = (date: Date) => {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+const formatRelativeTime = (dateStr: string): string => {
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  // For older dates, use ISO format to ensure consistency
-  return date.toISOString().split('T')[0];
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toISOString().split('T')[0];
+  } catch {
+    return "";
+  }
 };
 
-// Use fixed timestamps to prevent hydration errors
-const FIXED_TIMESTAMP = "2023-01-01T12:00:00.000Z";
+// Group messages by customer contact into conversations
+const groupMessagesIntoConversations = (messages: SMSMessage[]): Map<string, SMSMessage[]> => {
+  const grouped = new Map<string, SMSMessage[]>();
 
-// Mock data for initial display with consistent timestamps
-const mockConversations: ConversationSummary[] = [
-  {
-    id: "1",
-    contact: "John Doe",
-    lastMessage: "Hi, I need help with my order #12345",
-    timestamp: "5m ago",
-    unread: true,
-  },
-  {
-    id: "2",
-    contact: "Jane Smith",
-    lastMessage: "Thanks for your assistance!",
-    timestamp: "2h ago",
-    unread: false,
-  },
-  {
-    id: "3",
-    contact: "+1 (555) 123-4567",
-    lastMessage: "When will my order be delivered?",
-    timestamp: "Yesterday",
-    unread: false,
-  },
-];
+  messages.forEach(msg => {
+    const contact = msg.customer_contact;
+    if (!grouped.has(contact)) {
+      grouped.set(contact, []);
+    }
+    grouped.get(contact)!.push(msg);
+  });
 
-const mockMessages: Record<string, SMSMessage[]> = {
-  "1": [
-    {
-      id: "1-1",
-      from: "+15551234567",
-      to: "+15559876543",
-      text: "Hi, I need help with my order #12345",
-      timestamp: FIXED_TIMESTAMP,
-      direction: "incoming",
-    },
-    {
-      id: "1-2",
-      from: "+15559876543",
-      to: "+15551234567",
-      text: "Sure, I can help you with that. Can you please provide more details about your order?",
-      timestamp: FIXED_TIMESTAMP,
-      direction: "outgoing",
-    },
-  ],
-  "2": [
-    {
-      id: "2-1",
-      from: "+15559876541",
-      to: "+15551234567",
-      text: "Thanks for your assistance!",
-      timestamp: FIXED_TIMESTAMP,
-      direction: "incoming",
-    },
-  ],
-  "3": [
-    {
-      id: "3-1",
-      from: "+15551234568",
-      to: "+15559876543",
-      text: "When will my order be delivered?",
-      timestamp: FIXED_TIMESTAMP,
-      direction: "incoming",
-    },
-    {
-      id: "3-2",
-      from: "+15559876543",
-      to: "+15551234568",
-      text: "Your order will be delivered by Friday.",
-      timestamp: FIXED_TIMESTAMP,
-      direction: "outgoing",
-    },
-  ],
+  // Sort messages within each conversation by created_at
+  grouped.forEach((msgs, contact) => {
+    msgs.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  });
+
+  return grouped;
+};
+
+// Convert grouped messages to ConversationSummary for the list
+const createConversationSummaries = (grouped: Map<string, SMSMessage[]>): ConversationSummary[] => {
+  const summaries: ConversationSummary[] = [];
+
+  grouped.forEach((messages, contact) => {
+    const lastMessage = messages[messages.length - 1];
+    summaries.push({
+      id: contact, // Use contact as unique ID
+      contact: contact,
+      lastMessage: lastMessage?.message_text || "",
+      timestamp: lastMessage?.created_at || "",
+      unread: messages.some(m => m.direction === "incoming" && !m.ai_response),
+    });
+  });
+
+  // Sort by most recent message first
+  summaries.sort((a, b) => {
+    const dateA = new Date(a.timestamp).getTime() || 0;
+    const dateB = new Date(b.timestamp).getTime() || 0;
+    return dateB - dateA;
+  });
+
+  return summaries;
 };
 
 export default function SMSInboxPage() {
-  const [conversations, setConversations] = useState<ConversationSummary[]>(mockConversations);
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>("1");
-  const [messages, setMessages] = useState<SMSMessage[]>(mockMessages["1"] || []);
-  const [isLoading, setIsLoading] = useState(false);
+  const [allMessages, setAllMessages] = useState<SMSMessage[]>([]);
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [selectedContact, setSelectedContact] = useState<string | null>(null);
+  const [currentMessages, setCurrentMessages] = useState<SMSMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Get tenant_id and channel_id from context or props
-  const tenantId = "tenant_123"; // Replace with actual tenant ID
-  const channelId = "channel_sms"; // Replace with actual channel ID
-
-  // Fetch conversations
-  const fetchConversations = async () => {
+  // Get tenant_id and channel_id from localStorage user data
+  const getTenantInfo = useCallback(() => {
+    if (typeof window === "undefined") return { tenantId: "", channelId: "" };
     try {
-      // Uncomment when backend is ready
-      // const response = await axiosInstance.get(`/sms/messages`, {
-      //   params: {
-      //     tenant_id: tenantId,
-      //     channel_id: channelId,
-      //     page: 1,
-      //     limit: 50,
-      //   },
-      // });
-      // setConversations(response.data);
-    } catch (err) {
-      setError("Failed to fetch conversations");
-      console.error(err);
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        return {
+          tenantId: user.tenant_id || user.tenantId || "",
+          channelId: user.channel_id || "sms_channel",
+        };
+      }
+    } catch (e) {
+      console.error("Failed to parse user data:", e);
     }
-  };
+    return { tenantId: "", channelId: "sms_channel" };
+  }, []);
 
-  // Fetch messages for selected conversation
-  const fetchMessages = async (conversationId: string) => {
-    try {
-      // Uncomment when backend is ready
-      // const response = await axiosInstance.get(`/sms/messages/${conversationId}`);
-      // setMessages(response.data.messages);
-      setMessages(mockMessages[conversationId] || []);
-    } catch (err) {
-      setError("Failed to fetch messages");
-      console.error(err);
-    }
-  };
-
-  // Handle conversation selection
-  const handleSelectConversation = (conversationId: string) => {
-    setSelectedConversationId(conversationId);
-    fetchMessages(conversationId);
-  };
-
-  // Handle sending a new message
-  const handleSendMessage = async (messageText: string) => {
-    if (!selectedConversationId) return;
-
-    setIsLoading(true);
+  // Fetch all SMS messages from backend
+  const fetchMessages = useCallback(async (showLoading = false) => {
+    if (showLoading) setIsLoading(true);
     setError(null);
 
     try {
-      // Get the contact phone number from the selected conversation
-      const selectedConversation = conversations.find(c => c.id === selectedConversationId);
-      const toPhoneNumber = selectedConversation?.contact || "";
+      const response = await axiosInstance.get("/sms/messages");
 
-      // Uncomment when backend is ready
-      // const response = await axiosInstance.post(`/sms/send`, {
-      //   tenant_id: tenantId,
-      //   channel_id: channelId,
-      //   to: toPhoneNumber,
-      //   message: messageText,
-      // });
+      // Handle different response formats
+      let messages: SMSMessage[] = [];
+      if (Array.isArray(response.data)) {
+        messages = response.data;
+      } else if (response.data?.items && Array.isArray(response.data.items)) {
+        messages = response.data.items;
+      } else if (response.data?.messages && Array.isArray(response.data.messages)) {
+        messages = response.data.messages;
+      } else if (response.data?.data && Array.isArray(response.data.data)) {
+        messages = response.data.data;
+      }
 
-      // Add the new message to the UI immediately
-      const newMessage: SMSMessage = {
-        id: `msg-${Date.now()}`,
-        from: "+15559876543", // Agent phone number
-        to: toPhoneNumber,
-        text: messageText,
-        timestamp: FIXED_TIMESTAMP, // Use fixed timestamp to prevent hydration errors
-        direction: "outgoing",
-      };
+      setAllMessages(messages);
 
-      setMessages(prev => [...prev, newMessage]);
+      // Group into conversations
+      const grouped = groupMessagesIntoConversations(messages);
+      const summaries = createConversationSummaries(grouped);
+      setConversations(summaries);
 
-      // Update the conversation list with the new last message
-      setConversations(prev =>
-        prev.map(conv =>
-          conv.id === selectedConversationId
-            ? { 
-                ...conv, 
-                lastMessage: messageText, 
-                timestamp: formatRelativeTime(new Date()),
-                unread: false
-              }
-            : conv
-        )
-      );
-    } catch (err) {
-      setError("Failed to send message");
-      console.error(err);
+      // Update current conversation messages if one is selected
+      if (selectedContact && grouped.has(selectedContact)) {
+        setCurrentMessages(grouped.get(selectedContact) || []);
+      }
+
+      // Auto-select first conversation if none selected
+      if (!selectedContact && summaries.length > 0) {
+        const firstContact = summaries[0].contact;
+        setSelectedContact(firstContact);
+        setCurrentMessages(grouped.get(firstContact) || []);
+      }
+    } catch (err: unknown) {
+      console.error("Failed to fetch SMS messages:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to load messages";
+      if (showLoading) {
+        setError(errorMessage);
+      }
     } finally {
-      setIsLoading(false);
+      if (showLoading) setIsLoading(false);
+    }
+  }, [selectedContact]);
+
+  // Handle conversation selection
+  const handleSelectConversation = useCallback((conversationId: string) => {
+    setSelectedContact(conversationId);
+
+    // Get messages for this contact from allMessages
+    const grouped = groupMessagesIntoConversations(allMessages);
+    setCurrentMessages(grouped.get(conversationId) || []);
+
+    // Mark as read (update local state)
+    setConversations(prev =>
+      prev.map(conv =>
+        conv.id === conversationId ? { ...conv, unread: false } : conv
+      )
+    );
+  }, [allMessages]);
+
+  // Handle sending a new message
+  const handleSendMessage = async (messageText: string) => {
+    if (!selectedContact || !messageText.trim()) return;
+
+    setIsSending(true);
+    setError(null);
+
+    const { tenantId, channelId } = getTenantInfo();
+
+    // Create optimistic message for immediate UI update
+    const optimisticMessage: SMSMessage = {
+      id: `temp-${Date.now()}`,
+      customer_contact: selectedContact,
+      message_text: messageText,
+      direction: "outgoing",
+      created_at: new Date().toISOString(),
+    };
+
+    // Optimistically add to UI
+    setCurrentMessages(prev => [...prev, optimisticMessage]);
+    setAllMessages(prev => [...prev, optimisticMessage]);
+
+    // Update conversation list
+    setConversations(prev =>
+      prev.map(conv =>
+        conv.id === selectedContact
+          ? { ...conv, lastMessage: messageText, timestamp: new Date().toISOString() }
+          : conv
+      )
+    );
+
+    try {
+      const response = await axiosInstance.post("/sms/messages/send", {
+        tenant_id: tenantId,
+        channel_id: channelId,
+        to: selectedContact,
+        message_text: messageText,
+      });
+
+      // Replace optimistic message with real one if backend returns it
+      if (response.data?.id) {
+        const realMessage: SMSMessage = {
+          ...optimisticMessage,
+          id: response.data.id,
+        };
+        setCurrentMessages(prev =>
+          prev.map(m => (m.id === optimisticMessage.id ? realMessage : m))
+        );
+        setAllMessages(prev =>
+          prev.map(m => (m.id === optimisticMessage.id ? realMessage : m))
+        );
+      }
+    } catch (err: unknown) {
+      console.error("Failed to send message:", err);
+
+      // Remove optimistic message on failure
+      setCurrentMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
+      setAllMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
+
+      const errorMessage = err instanceof Error ? err.message : "Failed to send message";
+      setError(errorMessage);
+    } finally {
+      setIsSending(false);
     }
   };
 
-  // Poll for new messages every 5 seconds
+  // Initial load and polling setup
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (selectedConversationId) {
-        fetchMessages(selectedConversationId);
+    setMounted(true);
+    fetchMessages(true);
+
+    // Set up polling every 3 seconds
+    pollingRef.current = setInterval(() => {
+      fetchMessages(false);
+    }, 3000);
+
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
       }
-    }, 5000);
+    };
+  }, [fetchMessages]);
 
-    return () => clearInterval(interval);
-  }, [selectedConversationId]);
-
-  // Load initial data
+  // Update current messages when selected contact changes
   useEffect(() => {
-    fetchConversations();
-    if (selectedConversationId) {
-      fetchMessages(selectedConversationId);
+    if (selectedContact) {
+      const grouped = groupMessagesIntoConversations(allMessages);
+      setCurrentMessages(grouped.get(selectedContact) || []);
     }
-  }, []);
+  }, [selectedContact, allMessages]);
 
-  const selectedConversation = conversations.find(c => c.id === selectedConversationId);
+  const selectedConversation = conversations.find(c => c.id === selectedContact);
+
+  // Prevent hydration mismatch by not rendering time-dependent content until mounted
+  if (!mounted) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-7rem)]">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">SMS Inbox</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Manage your SMS conversations</p>
+        </div>
+        <Card className="flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm">
+          <CardContent className="p-0 h-full flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">SMS Inbox</h1>
-        <p className="text-gray-500">Manage your SMS conversations</p>
+    <div className="flex flex-col h-[calc(100vh-7rem)]">
+      {/* Page Header */}
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">SMS Inbox</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your SMS conversations</p>
       </div>
 
-      <Card className="flex-1 flex flex-col">
-        <CardContent className="p-0 flex-1 flex h-[calc(100vh-200px)]">
-          {/* Left Sidebar - Message List */}
-          <div className="w-1/3 border-r">
-            <MessageList
-              conversations={conversations}
-              selectedConversationId={selectedConversationId}
-              onSelectConversation={handleSelectConversation}
-            />
-          </div>
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-center gap-2 text-red-700 dark:text-red-300">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <span className="text-sm">{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="ml-auto text-red-500 hover:text-red-700"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
-          {/* Right Panel - Conversation Window */}
-          <div className="flex-1 flex flex-col">
-            {selectedConversation ? (
-              <>
-                <MessageThread
-                  messages={messages}
-                  contactName={selectedConversation.contact}
-                />
-                <NewMessageInput
-                  onSend={handleSendMessage}
-                  isLoading={isLoading}
-                />
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <p className="text-gray-500">Select a conversation to start messaging</p>
+      {/* Main Content */}
+      <Card className="flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm">
+        <CardContent className="p-0 h-full flex">
+          {isLoading ? (
+            // Loading State
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">Loading messages...</p>
               </div>
-            )}
-          </div>
+            </div>
+          ) : conversations.length === 0 ? (
+            // Empty State
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center p-8">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center">
+                  <MessageSquare className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No messages yet</h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  When you receive SMS messages, they will appear here.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Left Sidebar - Conversation List */}
+              <div className="w-full md:w-80 lg:w-96 border-r border-gray-200 dark:border-neutral-800 flex-shrink-0">
+                <MessageList
+                  conversations={conversations}
+                  selectedConversationId={selectedContact}
+                  onSelectConversation={handleSelectConversation}
+                  formatRelativeTime={formatRelativeTime}
+                />
+              </div>
+
+              {/* Right Panel - Conversation Thread */}
+              <div className="hidden md:flex flex-1 flex-col bg-gray-50 dark:bg-neutral-900">
+                {selectedConversation ? (
+                  <>
+                    <MessageThread
+                      messages={currentMessages}
+                      contactName={selectedConversation.contact}
+                    />
+                    <NewMessageInput
+                      onSend={handleSendMessage}
+                      isLoading={isSending}
+                    />
+                  </>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center">
+                        <MessageSquare className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400">Select a conversation to start messaging</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

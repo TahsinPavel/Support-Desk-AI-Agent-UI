@@ -141,16 +141,30 @@ export default function AnalyticsDashboard() {
     { refreshInterval: 5000 }
   );
 
+  // Helper function to ensure data is an array
+  const ensureArray = (data: unknown): any[] => {
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && 'data' in data && Array.isArray((data as any).data)) {
+      return (data as any).data;
+    }
+    return [];
+  };
+
   // Combine daily data for line chart
   const combineDailyData = (): DailyActivity[] => {
-    if (!smsDaily || !emailDaily || !voiceDaily || !chatDaily) return [];
-    
-    return smsDaily.map((smsItem, index) => ({
-      date: smsItem.date,
-      sms: smsItem.count,
-      email: emailDaily[index]?.count || 0,
-      voice: voiceDaily[index]?.count || 0,
-      chat: chatDaily[index]?.count || 0
+    const smsArr = ensureArray(smsDaily);
+    const emailArr = ensureArray(emailDaily);
+    const voiceArr = ensureArray(voiceDaily);
+    const chatArr = ensureArray(chatDaily);
+
+    if (smsArr.length === 0) return [];
+
+    return smsArr.map((smsItem, index) => ({
+      date: smsItem?.date || '',
+      sms: smsItem?.count || 0,
+      email: emailArr[index]?.count || 0,
+      voice: voiceArr[index]?.count || 0,
+      chat: chatArr[index]?.count || 0
     }));
   };
 
@@ -158,20 +172,23 @@ export default function AnalyticsDashboard() {
 
   // Combine type distributions for pie chart
   const combineTypeData = (): MessageTypeDistribution[] => {
-    if (!smsTypes || !emailTypes || !voiceTypes || !chatTypes) return [];
-    
+    const smsArr = ensureArray(smsTypes);
+    const emailArr = ensureArray(emailTypes);
+    const voiceArr = ensureArray(voiceTypes);
+    const chatArr = ensureArray(chatTypes);
+
     const allTypes = [
-      ...(smsTypes || []).map((item: any) => ({ ...item, type: `SMS - ${item.type}` })),
-      ...(emailTypes || []).map((item: any) => ({ ...item, type: `Email - ${item.type}` })),
-      ...(voiceTypes || []).map((item: any) => ({ ...item, type: `Voice - ${item.type}` })),
-      ...(chatTypes || []).map((item: any) => ({ ...item, type: `Chat - ${item.type}` }))
+      ...smsArr.map((item: any) => ({ ...item, type: `SMS - ${item?.type || 'Unknown'}` })),
+      ...emailArr.map((item: any) => ({ ...item, type: `Email - ${item?.type || 'Unknown'}` })),
+      ...voiceArr.map((item: any) => ({ ...item, type: `Voice - ${item?.type || 'Unknown'}` })),
+      ...chatArr.map((item: any) => ({ ...item, type: `Chat - ${item?.type || 'Unknown'}` }))
     ];
-    
-    const totalCount = allTypes.reduce((sum, item) => sum + item.count, 0);
-    
+
+    const totalCount = allTypes.reduce((sum, item) => sum + (item?.count || 0), 0);
+
     return allTypes.map(item => ({
       ...item,
-      percentage: totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0
+      percentage: totalCount > 0 ? Math.round(((item?.count || 0) / totalCount) * 100) : 0
     }));
   };
 
@@ -192,32 +209,32 @@ export default function AnalyticsDashboard() {
   const kpiData = [
     {
       title: "SMS Messages",
-      value: smsSummary ? smsSummary.totalMessages.toString() : "0",
-      change: smsSummary ? smsSummary.changePercentage : 0,
+      value: (smsSummary?.totalMessages ?? 0).toString(),
+      change: smsSummary?.changePercentage ?? 0,
       icon: MessageSquare,
       iconColor: "bg-blue-500",
       isLoading: smsLoading
     },
     {
       title: "Emails",
-      value: emailSummary ? emailSummary.totalEmails.toString() : "0",
-      change: emailSummary ? emailSummary.changePercentage : 0,
+      value: (emailSummary?.totalEmails ?? 0).toString(),
+      change: emailSummary?.changePercentage ?? 0,
       icon: Mail,
       iconColor: "bg-purple-500",
       isLoading: emailLoading
     },
     {
       title: "Voice Calls",
-      value: voiceSummary ? voiceSummary.totalCalls.toString() : "0",
-      change: voiceSummary ? voiceSummary.changePercentage : 0,
+      value: (voiceSummary?.totalCalls ?? 0).toString(),
+      change: voiceSummary?.changePercentage ?? 0,
       icon: Phone,
       iconColor: "bg-green-500",
       isLoading: voiceLoading
     },
     {
       title: "Chat Sessions",
-      value: chatSummary ? chatSummary.totalChats.toString() : "0",
-      change: chatSummary ? chatSummary.changePercentage : 0,
+      value: (chatSummary?.totalChats ?? 0).toString(),
+      change: chatSummary?.changePercentage ?? 0,
       icon: MessageCircle,
       iconColor: "bg-yellow-500",
       isLoading: chatLoading
@@ -229,7 +246,7 @@ export default function AnalyticsDashboard() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6 p-6"
+      className="space-y-6"
       key={refreshIndex}
     >
       {/* Section 1: Top Header */}
@@ -240,12 +257,12 @@ export default function AnalyticsDashboard() {
         className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
       >
         <div>
-          <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">Real-time overview of your communication metrics</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Real-time overview of your communication metrics</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[180px] bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700">
               <SelectValue placeholder="Select date range" />
             </SelectTrigger>
             <SelectContent>
@@ -256,7 +273,7 @@ export default function AnalyticsDashboard() {
               <SelectItem value="month">This Month</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="icon" onClick={handleRefresh}>
+          <Button variant="outline" size="icon" onClick={handleRefresh} className="border-gray-200 dark:border-neutral-700">
             <RefreshCw className="h-4 w-4" />
           </Button>
         </div>

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { VoiceListItem } from "@/components/voice/VoiceListItem";
 import { VoiceHistoryResponse } from "@/types/voice";
+import { Search, ChevronLeft, ChevronRight, Phone } from "lucide-react";
 
 interface VoiceListProps {
   history: VoiceHistoryResponse;
@@ -42,25 +43,28 @@ export function VoiceList({
   ];
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white dark:bg-neutral-900">
       {/* Search and Filters */}
-      <div className="p-4 border-b">
-        <Input
-          placeholder="Search calls..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mb-4"
-        />
-        
+      <div className="p-4 border-b border-gray-200 dark:border-neutral-800">
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Search calls..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
+          />
+        </div>
+
         <div className="flex flex-wrap gap-2">
           {filterOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => onFilterChange(option.value)}
-              className={`px-3 py-1 rounded-full text-sm ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 filter === option.value
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-sm"
+                  : "bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700"
               }`}
             >
               {option.label}
@@ -74,52 +78,62 @@ export function VoiceList({
         {filteredCalls.length > 0 ? (
           <div className="overflow-y-auto h-full">
             <table className="w-full">
-              <thead className="bg-gray-50 sticky top-0">
+              <thead className="bg-gray-50 dark:bg-neutral-800 sticky top-0 z-10">
                 <tr>
-                  <th className="p-4 text-left font-medium text-gray-500">Caller</th>
-                  <th className="p-4 text-left font-medium text-gray-500">Summary</th>
-                  <th className="p-4 text-left font-medium text-gray-500">Confidence</th>
-                  <th className="p-4 text-left font-medium text-gray-500">Date/Time</th>
-                  <th className="p-4 text-left font-medium text-gray-500">Actions</th>
+                  <th className="p-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Caller</th>
+                  <th className="p-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Summary</th>
+                  <th className="p-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Confidence</th>
+                  <th className="p-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date/Time</th>
+                  <th className="p-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
                 {filteredCalls.map((call) => (
-                  <VoiceListItem 
-                    key={call.id} 
-                    call={call} 
-                    onViewDetails={onCallSelect} 
+                  <VoiceListItem
+                    key={call.id}
+                    call={call}
+                    onViewDetails={onCallSelect}
                   />
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">No calls found</p>
+          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-4">
+              <Phone className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No calls found</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Try adjusting your search or filters</p>
           </div>
         )}
       </div>
 
       {/* Pagination */}
-      <div className="p-4 border-t flex justify-between items-center">
-        <button
+      <div className="p-4 border-t border-gray-200 dark:border-neutral-800 flex justify-between items-center bg-gray-50 dark:bg-neutral-900">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="px-3 py-1 rounded disabled:opacity-50"
+          className="gap-1"
         >
+          <ChevronLeft className="h-4 w-4" />
           Previous
-        </button>
-        <span className="text-sm text-gray-600">
+        </Button>
+        <span className="text-sm text-gray-600 dark:text-gray-400">
           Page {currentPage} of {totalPages}
         </span>
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="px-3 py-1 rounded disabled:opacity-50"
+          className="gap-1"
         >
           Next
-        </button>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

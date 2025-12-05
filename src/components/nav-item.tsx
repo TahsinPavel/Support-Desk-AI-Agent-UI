@@ -12,19 +12,22 @@ interface NavItemProps {
 
 export function NavItem({ icon: Icon, label, href }: NavItemProps) {
   const pathname = usePathname();
-  const isActive = pathname === href || pathname.startsWith(`${href}/`);
+  // Check exact match for dashboard, startsWith for sub-pages
+  const isActive = href === "/dashboard"
+    ? pathname === "/dashboard"
+    : pathname.startsWith(href);
 
   return (
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded px-3 py-2 text-sm font-medium transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
         isActive
-          ? "bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50"
-          : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25"
+          : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800"
       )}
     >
-      <Icon className="h-5 w-5" />
+      <Icon className={cn("h-5 w-5", isActive && "text-white")} />
       {label}
     </Link>
   );

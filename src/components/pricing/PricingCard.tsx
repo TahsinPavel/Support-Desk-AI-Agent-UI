@@ -11,9 +11,10 @@ export interface PricingTier {
   yearlyPrice: number | null;
   priceLabel?: string;
   features: string[];
-  resolutionCost: string;
+  resolutionCost?: string;
   popular?: boolean;
   enterprise?: boolean;
+  comingSoon?: boolean;
   icon: "starter" | "growth" | "enterprise";
 }
 
@@ -80,12 +81,15 @@ export function PricingCard({ tier, isYearly, onCheckout, index }: PricingCardPr
         </div>
 
         {/* Title & Description */}
-        <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
-        <p className="text-muted-foreground text-sm mb-6">{tier.description}</p>
+        <h3 className="text-2xl font-bold mb-6">{tier.name}</h3>
 
         {/* Price */}
         <div className="mb-6">
-          {tier.price !== null ? (
+          {tier.comingSoon ? (
+            <div className="text-3xl font-bold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent">
+              Available Soon
+            </div>
+          ) : tier.price !== null ? (
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-bold">${displayPrice}</span>
               <span className="text-muted-foreground">/month</span>
@@ -95,32 +99,29 @@ export function PricingCard({ tier, isYearly, onCheckout, index }: PricingCardPr
               {tier.priceLabel || "Custom Pricing"}
             </div>
           )}
-          {isYearly && tier.yearlyPrice && (
+          {!tier.comingSoon && isYearly && tier.yearlyPrice && (
             <p className="text-sm text-emerald-500 mt-1">
               Billed annually (${tier.yearlyPrice * 12}/year)
             </p>
           )}
         </div>
 
-        {/* Resolution cost */}
-        <div className="mb-6 px-3 py-2 rounded-lg bg-muted/50 border border-border/50">
-          <span className="text-sm text-muted-foreground">AI Resolution: </span>
-          <span className="text-sm font-semibold">{tier.resolutionCost}</span>
-        </div>
-
         {/* CTA Button */}
         <Button
           onClick={onCheckout}
           size="lg"
+          disabled={tier.comingSoon}
           className={`w-full mb-8 ${
-            tier.popular
+            tier.comingSoon
+              ? "bg-muted text-muted-foreground cursor-not-allowed"
+              : tier.popular
               ? `bg-gradient-to-r ${gradient} hover:opacity-90 shadow-lg shadow-indigo-500/25`
               : tier.enterprise
               ? `bg-gradient-to-r ${gradient} hover:opacity-90`
               : "bg-foreground text-background hover:bg-foreground/90"
           }`}
         >
-          {tier.enterprise ? "Contact Sales" : "Start Free Trial"}
+          {tier.comingSoon ? "Coming Soon" : tier.enterprise ? "Contact Sales" : "Start Free Trial"}
         </Button>
 
         {/* Features */}

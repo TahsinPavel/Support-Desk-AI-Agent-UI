@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import { Check, Minus } from "lucide-react";
 
@@ -70,15 +71,15 @@ export function ComparisonTable() {
         </thead>
         <tbody>
           {features.map((feature, index) => (
-            <>
+            <React.Fragment key={index}>
               {feature.category && (
-                <tr key={`cat-${index}`} className="bg-muted/30">
+                <tr className="bg-muted/30">
                   <td colSpan={4} className="py-3 px-4 font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                     {feature.category}
                   </td>
                 </tr>
               )}
-              <tr key={index} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+              <tr className="border-b border-border/50 hover:bg-muted/20 transition-colors">
                 <td className="py-4 px-4 text-sm">{feature.name}</td>
                 <td className="py-4 px-4 text-center">
                   <FeatureValue value={feature.starter} gradient="from-blue-500 to-cyan-500" />
@@ -90,7 +91,7 @@ export function ComparisonTable() {
                   <FeatureValue value={feature.enterprise} gradient="from-amber-500 to-orange-500" />
                 </td>
               </tr>
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>

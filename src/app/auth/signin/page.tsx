@@ -40,16 +40,32 @@ export default function SignInPage() {
         password: formData.password,
       });
 
-      if (response.success || response.token || response.user) {
+      // Check for various success indicators from backend
+      const isSuccess =
+        response.success === true ||
+        response.token ||
+        response.access_token ||
+        response.user ||
+        response.message?.toLowerCase().includes('success');
+
+      if (isSuccess) {
         // On success, redirect to dashboard
         router.push('/dashboard');
       } else {
-        setError(response.message || "Login failed. Please try again.");
+        setError(response.message || response.detail || "Login failed. Please try again.");
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message :
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        "Invalid email or password. Please try again.";
+      // Handle axios error response
+      const axiosError = err as { response?: { data?: { message?: string; detail?: string; error?: string } } };
+      const errorData = axiosError?.response?.data;
+
+      // Try different common error message fields
+      const errorMessage =
+        errorData?.message ||
+        errorData?.detail ||
+        errorData?.error ||
+        (err instanceof Error ? err.message : "Invalid email or password. Please try again.");
+
       setError(errorMessage);
     } finally {
       setLoading(false);

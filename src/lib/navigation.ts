@@ -1,10 +1,11 @@
-import { 
-  Home, 
-  MessageSquare, 
-  MessageCircle, 
-  Mail, 
-  Phone, 
-  Settings 
+import {
+  Home,
+  MessageSquare,
+  MessageCircle,
+  Mail,
+  Phone,
+  Settings,
+  Calendar,
 } from "lucide-react";
 
 export interface NavItem {
@@ -18,6 +19,11 @@ export const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: Home,
+  },
+  {
+    title: "Appointments",
+    href: "/dashboard/appointments",
+    icon: Calendar,
   },
   {
     title: "SMS",

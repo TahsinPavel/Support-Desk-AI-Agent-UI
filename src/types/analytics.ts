@@ -102,3 +102,32 @@ export interface AssistantPerformance {
   efficiencyScore: number;
   changePercentage: number;
 }
+
+// Basic Analytics Types (from /analytics/basic endpoint)
+export interface MessageOverTime {
+  date: string;
+  count: number;
+}
+
+export interface BasicAnalyticsData {
+  total_messages: number;
+  ai_resolved: number;
+  escalated: number;
+  sms_count: number;
+  email_count: number;
+  chat_count: number;
+  voice_count: number;
+  messages_over_time: MessageOverTime[];
+}
+
+export interface AnalyticsState {
+  data: BasicAnalyticsData | null;
+  loading: boolean;
+  error: string | null;
+}
+
+// Computed metrics
+export interface ComputedMetrics {
+  resolutionRate: number;
+  totalChannelMessages: number;
+}

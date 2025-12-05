@@ -65,9 +65,17 @@ function SignUpForm() {
         setError(response.message || "Registration failed. Please try again.");
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message :
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        "Failed to create account. Please try again.";
+      // Handle axios error response
+      const axiosError = err as { response?: { data?: { message?: string; detail?: string; error?: string } } };
+      const errorData = axiosError?.response?.data;
+
+      // Try different common error message fields
+      const errorMessage =
+        errorData?.message ||
+        errorData?.detail ||
+        errorData?.error ||
+        (err instanceof Error ? err.message : "Failed to create account. Please try again.");
+
       setError(errorMessage);
     } finally {
       setLoading(false);
