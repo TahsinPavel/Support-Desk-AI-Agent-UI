@@ -3,14 +3,15 @@ import {
   EmailMessage,
   SendEmailRequest
 } from '@/types/email';
+import { EMAIL_ENDPOINTS } from '@/lib/api';
 
 /**
  * Fetch all emails from the inbox
- * GET /email/messages
+ * GET /api/email/messages
  */
 export async function getEmails(): Promise<EmailMessage[]> {
   try {
-    const response = await axiosInstance.get('/email/messages');
+    const response = await axiosInstance.get(EMAIL_ENDPOINTS.LIST);
 
     // Handle different response formats
     if (Array.isArray(response.data)) {
@@ -31,11 +32,11 @@ export async function getEmails(): Promise<EmailMessage[]> {
 
 /**
  * Send an email reply
- * POST /email/send
+ * POST /api/email/send
  */
 export async function sendEmail(data: SendEmailRequest): Promise<void> {
   try {
-    await axiosInstance.post('/email/send', data);
+    await axiosInstance.post(EMAIL_ENDPOINTS.SEND, data);
   } catch (error) {
     console.error('Error sending email:', error);
     throw error;

@@ -40,7 +40,7 @@ export default function Navbar() {
             <Link href="/auth/signin">Sign In</Link>
           </Button>
           <Button asChild className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-md shadow-indigo-500/20">
-            <Link href="/auth/signup">Start Free Trial</Link>
+            <Link href="/auth/signup">Subscribe Now</Link>
           </Button>
         </div>
       </div>

@@ -17,7 +17,6 @@ const features: Feature[] = [
   { name: "AI Email Agent", starter: true, growth: true, enterprise: true },
   { name: "AI SMS Agent", starter: true, growth: true, enterprise: true },
   { name: "AI Voice Agent", starter: true, growth: true, enterprise: true },
-  { category: "Team & Seats", name: "Human Agent Seats", starter: "2 seats", growth: "5 seats", enterprise: "Unlimited" },
   { name: "Phone Number Connectors", starter: "1", growth: "Multiple", enterprise: "Unlimited" },
   { name: "Email Connectors", starter: "1", growth: "Multiple", enterprise: "Unlimited" },
   { category: "Knowledge & AI", name: "Knowledge Base Sources", starter: "1", growth: "Custom (PDF, Notion, Web)", enterprise: "Unlimited" },

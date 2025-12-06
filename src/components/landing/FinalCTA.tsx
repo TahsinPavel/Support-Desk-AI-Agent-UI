@@ -64,7 +64,7 @@ export function FinalCTA() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto"
           >
-            Start automating your business today — no credit card required.
+            Transform your business with AI-powered automation. Get started today.
           </motion.p>
 
           <motion.div
@@ -80,7 +80,7 @@ export function FinalCTA() {
               className="text-base px-8 py-6 bg-white text-indigo-600 hover:bg-white/90 shadow-lg shadow-black/20 hover:shadow-xl transition-all duration-300"
             >
               <Link href="/auth/signup">
-                Start Free Trial
+                Subscribe Now
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -105,10 +105,10 @@ export function FinalCTA() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-12 flex flex-wrap justify-center gap-6 text-white/60 text-sm"
           >
-            <span>✓ Free 14-day trial</span>
-            <span>✓ No credit card</span>
-            <span>✓ Cancel anytime</span>
-            <span>✓ 24/7 support</span>
+            <span>✓ Instant activation</span>
+            <span>✓ 24/7 customer support</span>
+            <span>✓ Works with SMS, voice, email & chat</span>
+            <span>✓ Scales with your business</span>
           </motion.div>
         </motion.div>
       </div>

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   // Use /api proxy to avoid CORS issues (proxied to backend via next.config.ts rewrites)
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  baseURL: '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

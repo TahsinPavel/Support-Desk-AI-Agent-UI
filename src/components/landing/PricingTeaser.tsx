@@ -7,9 +7,9 @@ import Link from "next/link";
 
 const highlights = [
   "No hidden fees",
-  "Cancel anytime",
-  "14-day free trial",
-  "No credit card required",
+  "Upgrade or downgrade anytime",
+  "Transparent monthly pricing",
+  "Backed by 24/7 support",
 ];
 
 export function PricingTeaser() {

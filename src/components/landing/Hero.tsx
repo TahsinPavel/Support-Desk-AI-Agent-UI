@@ -49,8 +49,7 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10"
         >
-          Streamline workflows, boost productivity, and deliver exceptional customer 
-          experiences with AI-powered automation built for modern teams.
+          Automate workflows, boost productivity, and deliver exceptional customer experiences with AI-powered solutions built for modern teams.
         </motion.p>
 
         <motion.div
@@ -65,7 +64,7 @@ export function Hero() {
             className="text-base px-8 py-6 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300"
           >
             <Link href="/auth/signup">
-              Start Free Trial
+              Subscribe Now
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

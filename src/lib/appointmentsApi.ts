@@ -5,13 +5,14 @@ import {
   AppointmentFormData,
   AppointmentUpdateData,
 } from "@/types/appointments";
+import { APPOINTMENTS_ENDPOINTS } from "@/lib/api";
 
 /**
  * Fetch all appointments for current tenant
- * GET /appointments
+ * GET /api/appointments
  */
 export async function getAppointments(): Promise<Appointment[]> {
-  const response = await axiosInstance.get("/appointments");
+  const response = await axiosInstance.get(APPOINTMENTS_ENDPOINTS.LIST);
 
   // Handle different response formats
   const data = response.data;
@@ -34,14 +35,14 @@ export async function getAppointments(): Promise<Appointment[]> {
 
 /**
  * Fetch appointment summary stats
- * GET /appointments/summary?days=30
+ * GET /api/appointments/summary?days=30
  */
 export async function getAppointmentSummary(
   days: number = 30
 ): Promise<AppointmentSummary | null> {
   try {
     const response = await axiosInstance.get<AppointmentSummary>(
-      `/appointments/summary?days=${days}`
+      `${APPOINTMENTS_ENDPOINTS.SUMMARY}?days=${days}`
     );
     return response.data;
   } catch (error) {
@@ -53,46 +54,31 @@ export async function getAppointmentSummary(
 
 /**
  * Create a new appointment
- * POST /appointments
+ * POST /api/appointments
  */
 export async function createAppointment(
   data: AppointmentFormData
 ): Promise<Appointment> {
-  const response = await axiosInstance.post<Appointment>("/appointments", data);
+  const response = await axiosInstance.post(APPOINTMENTS_ENDPOINTS.CREATE, data);
   return response.data;
 }
 
 /**
  * Update an existing appointment
- * PUT /appointments/{id}
+ * PUT /api/appointments/{id}
  */
 export async function updateAppointment(
   id: string,
   data: AppointmentUpdateData
 ): Promise<Appointment> {
-  const response = await axiosInstance.put<Appointment>(
-    `/appointments/${id}`,
-    data
-  );
+  const response = await axiosInstance.put(APPOINTMENTS_ENDPOINTS.UPDATE(id), data);
   return response.data;
 }
 
 /**
- * Delete an appointment (optional endpoint)
- * DELETE /appointments/{id}
+ * Delete an appointment
+ * DELETE /api/appointments/{id}
  */
 export async function deleteAppointment(id: string): Promise<void> {
-  await axiosInstance.delete(`/appointments/${id}`);
+  await axiosInstance.delete(APPOINTMENTS_ENDPOINTS.DELETE(id));
 }
-
-/**
- * Appointment API endpoints
- */
-export const APPOINTMENTS_API = {
-  LIST: "/appointments",
-  SUMMARY: "/appointments/summary",
-  CREATE: "/appointments",
-  UPDATE: (id: string) => `/appointments/${id}`,
-  DELETE: (id: string) => `/appointments/${id}`,
-} as const;
-

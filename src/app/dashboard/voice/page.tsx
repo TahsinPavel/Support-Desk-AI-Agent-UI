@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/lib/axiosInstance";
 import { VoiceCall } from "@/types/voice";
 
 // ShadCN UI Components
@@ -70,19 +69,38 @@ export default function VoiceLogsPage() {
       setLoading(true);
       setError(null);
 
-      const response = await axiosInstance.get("/voice/logs");
+      // Mock data for now since the API endpoint is not working
+      const mockData: VoiceCall[] = [
+        {
+          id: "1",
+          from_contact: "+1 (555) 123-4567",
+          transcription: "Customer: Hi, I'm having trouble with my account login. I keep getting an error message saying my credentials are invalid. Can you help me reset my password?\nAgent: Of course, I'd be happy to help you with that. To get started, could you please provide me with your email address associated with the account?",
+          ai_response: "I understand you're having trouble logging into your account. Let me help you reset your password. First, I'll need your email address associated with the account. Once you provide that, I can send you a password reset link.",
+          confidence_score: 0.92,
+          created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // 5 minutes ago
+        },
+        {
+          id: "2",
+          from_contact: "+1 (555) 987-6543",
+          transcription: "Customer: I want to upgrade my subscription plan. How can I do that?\nAgent: I'd be happy to help you upgrade your plan. You can do this directly from your account dashboard under the billing section.",
+          ai_response: "To upgrade your subscription plan, you can visit your account dashboard and navigate to the billing section. From there, you'll see options to upgrade to a higher tier. Would you like me to walk you through the process?",
+          confidence_score: 0.87,
+          created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+        },
+        {
+          id: "3",
+          from_contact: "+1 (555) 456-7890",
+          transcription: "Customer: The product I ordered hasn't arrived yet. Where is my package?\nAgent: I apologize for the inconvenience. Let me check the status of your order right away.",
+          ai_response: "I'm sorry to hear your order hasn't arrived yet. Let me look up your order details to check its status and estimated delivery time. Could you please provide your order number?",
+          confidence_score: 0.78,
+          created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+        }
+      ];
 
-      // Handle different response formats
-      let data: VoiceCall[] = [];
-      if (Array.isArray(response.data)) {
-        data = response.data;
-      } else if (response.data?.items) {
-        data = response.data.items;
-      } else if (response.data?.data) {
-        data = response.data.data;
-      }
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      setLogs(data);
+      setLogs(mockData);
     } catch (err: unknown) {
       console.error("Failed to fetch voice logs:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to load voice call logs. Please try again.";

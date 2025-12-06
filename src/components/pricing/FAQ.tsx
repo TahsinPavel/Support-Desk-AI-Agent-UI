@@ -11,14 +11,6 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: "How does the 7-day free trial work?",
-    answer: "Start your free trial instantly — no credit card required. You'll get full access to all features in your selected plan. If you love it, simply add your payment details to continue after the trial ends."
-  },
-  {
-    question: "What counts as an AI resolution?",
-    answer: "An AI resolution is counted when our AI successfully handles a customer inquiry without needing human intervention. This includes answering questions, scheduling appointments, providing information, or completing tasks autonomously."
-  },
-  {
     question: "Can I switch plans later?",
     answer: "Absolutely! You can upgrade or downgrade your plan at any time. When upgrading, you'll get immediate access to new features. When downgrading, changes take effect at your next billing cycle."
   },

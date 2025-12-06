@@ -26,6 +26,8 @@ export const SMS_ENDPOINTS = {
 
 // Email API endpoints
 export const EMAIL_ENDPOINTS = {
+  LIST: '/email/messages',
+  SEND: '/email/send',
   RECEIVE: '/email/email/receive',
   SUMMARY: '/analytics/email/summary',
   DAILY: '/analytics/email/daily',

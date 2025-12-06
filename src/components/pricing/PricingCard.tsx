@@ -121,7 +121,7 @@ export function PricingCard({ tier, isYearly, onCheckout, index }: PricingCardPr
               : "bg-foreground text-background hover:bg-foreground/90"
           }`}
         >
-          {tier.comingSoon ? "Coming Soon" : tier.enterprise ? "Contact Sales" : "Start Free Trial"}
+          {tier.comingSoon ? "Coming Soon" : tier.enterprise ? "Contact Sales" : "Subscribe Now"}
         </Button>
 
         {/* Features */}

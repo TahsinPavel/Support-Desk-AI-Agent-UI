@@ -8,6 +8,7 @@ import { NewMessageInput } from "@/components/sms/NewMessageInput";
 import { Loader2, AlertCircle, MessageSquare } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { ConversationSummary, SMSMessage, Conversation } from "@/types/sms";
+import { SMS_ENDPOINTS } from "@/lib/api";
 
 // Locale-agnostic timestamp formatting function to prevent hydration errors
 const formatRelativeTime = (dateStr: string): string => {
@@ -109,7 +110,7 @@ export default function SMSInboxPage() {
     setError(null);
 
     try {
-      const response = await axiosInstance.get("/sms/messages");
+      const response = await axiosInstance.get(SMS_ENDPOINTS.LIST);
 
       // Handle different response formats
       let messages: SMSMessage[] = [];
@@ -137,28 +138,25 @@ export default function SMSInboxPage() {
 
       // Auto-select first conversation if none selected
       if (!selectedContact && summaries.length > 0) {
-        const firstContact = summaries[0].contact;
+        const firstContact = summaries[0].id;
         setSelectedContact(firstContact);
-        setCurrentMessages(grouped.get(firstContact) || []);
+        if (grouped.has(firstContact)) {
+          setCurrentMessages(grouped.get(firstContact) || []);
+        }
       }
     } catch (err: unknown) {
-      console.error("Failed to fetch SMS messages:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to load messages";
-      if (showLoading) {
-        setError(errorMessage);
-      }
+      console.error("Failed to fetch messages:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch messages";
+      setError(errorMessage);
     } finally {
-      if (showLoading) setIsLoading(false);
+      setIsLoading(false);
     }
   }, [selectedContact]);
 
-  // Handle conversation selection
-  const handleSelectConversation = useCallback((conversationId: string) => {
-    setSelectedContact(conversationId);
-
-    // Get messages for this contact from allMessages
-    const grouped = groupMessagesIntoConversations(allMessages);
-    setCurrentMessages(grouped.get(conversationId) || []);
+  // Mark conversation as read
+  const markAsRead = useCallback((conversationId: string) => {
+    // In a real app, this would make an API call to mark messages as read
+    console.log(`Marking conversation ${conversationId} as read`);
 
     // Mark as read (update local state)
     setConversations(prev =>
@@ -167,6 +165,18 @@ export default function SMSInboxPage() {
       )
     );
   }, [allMessages]);
+
+  // Handle selecting a conversation
+  const handleSelectConversation = useCallback((conversationId: string) => {
+    setSelectedContact(conversationId);
+
+    // Get messages for this contact from allMessages
+    const grouped = groupMessagesIntoConversations(allMessages);
+    setCurrentMessages(grouped.get(conversationId) || []);
+
+    // Mark as read
+    markAsRead(conversationId);
+  }, [allMessages, markAsRead]);
 
   // Handle sending a new message
   const handleSendMessage = async (messageText: string) => {
@@ -200,7 +210,7 @@ export default function SMSInboxPage() {
     );
 
     try {
-      const response = await axiosInstance.post("/sms/messages/send", {
+      const response = await axiosInstance.post(SMS_ENDPOINTS.SEND, {
         tenant_id: tenantId,
         channel_id: channelId,
         to: selectedContact,

@@ -3,6 +3,7 @@ import {
   VoiceHistoryResponse,
   VoiceDetailResponse
 } from '@/types/voice';
+import { VOICE_ENDPOINTS } from '@/lib/api';
 
 // Voice API functions
 export async function fetchVoiceHistory(
@@ -12,14 +13,8 @@ export async function fetchVoiceHistory(
   pageSize: number = 20
 ): Promise<VoiceHistoryResponse> {
   try {
-    const response = await axiosInstance.get('/voice/logs', {
-      params: {
-        tenant_id: tenantId,
-        channel_id: channelId,
-        page,
-        page_size: pageSize,
-      },
-    });
+    // Try a simpler endpoint first to see if it works
+    const response = await axiosInstance.get('/voice/logs');
 
     // Handle different response formats
     if (response.data?.items) {

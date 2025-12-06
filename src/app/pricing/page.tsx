@@ -32,7 +32,6 @@ const pricingTiers: PricingTier[] = [
     comingSoon: true,
     features: [
       "Everything in Starter",
-      "5 human agent seats",
       "CRM integrations (HubSpot, Salesforce, Pipedrive)",
       "Workflow automation builder",
       "Multi-language support",
@@ -50,7 +49,6 @@ const pricingTiers: PricingTier[] = [
     popular: true,
     features: [
       "AI Chat, Email, SMS & Voice agent",
-      "2 human agent seats",
       "Basic analytics",
       "1 knowledge base source",
       "Mobile-friendly inbox",
@@ -101,9 +99,11 @@ export default function PricingPage() {
       script.async = true;
       script.onload = () => {
         if (window.Paddle) {
-          window.Paddle.Initialize({
-            token: "YOUR_PADDLE_CLIENT_TOKEN", // Replace with your token
-            environment: "sandbox", // Change to "production" for live
+          // @ts-ignore
+          window.Paddle.Environment.set("sandbox"); // Change to "production" for live
+          // @ts-ignore
+          window.Paddle.Setup({ 
+            vendor: "YOUR_PADDLE_VENDOR_ID" // Replace with your vendor ID
           });
         }
       };
@@ -268,10 +268,10 @@ export default function PricingPage() {
               className="text-center max-w-3xl mx-auto"
             >
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-                Start Your 7-Day Free Trial
+                Ready to Transform Your Customer Support?
               </h2>
               <p className="text-lg md:text-xl text-white/80 mb-10">
-                No credit card required. Get full access to all features and see the power of AI-driven support.
+                Join thousands of businesses automating their support with AI.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -280,7 +280,7 @@ export default function PricingPage() {
                   className="text-base px-8 py-6 bg-white text-indigo-600 hover:bg-white/90 shadow-xl"
                 >
                   <a href="/auth/signup">
-                    Get Started Free
+                    Subscribe Now
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                 </Button>
@@ -294,7 +294,7 @@ export default function PricingPage() {
                 </Button>
               </div>
               <p className="mt-6 text-white/60 text-sm">
-                ✓ 7-day free trial &nbsp;&nbsp; ✓ No credit card &nbsp;&nbsp; ✓ Cancel anytime &nbsp;&nbsp; ✓ Full feature access
+                No credit card required to get started.
               </p>
             </motion.div>
           </div>
