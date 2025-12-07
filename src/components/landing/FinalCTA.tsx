@@ -4,40 +4,53 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export function FinalCTA() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section className="py-24 md:py-32 relative overflow-hidden">
       {/* Animated Gradient Background */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600"
-        animate={{
-          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        style={{ backgroundSize: "200% 200%" }}
-      />
+      {mounted && (
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600"
+          animate={{
+            backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          style={{ backgroundSize: "200% 200%" }}
+        />
+      )}
 
       {/* Overlay Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#fff1_1px,transparent_1px),linear-gradient(to_bottom,#fff1_1px,transparent_1px)] bg-[size:14px_24px] opacity-20" />
 
       {/* Animated Orbs */}
-      <motion.div
-        className="absolute top-0 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.1, 0.2, 0.1],
-        }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-0 right-1/4 w-80 h-80 bg-white/10 rounded-full blur-3xl"
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.15, 0.05, 0.15],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {mounted && (
+        <>
+          <motion.div
+            className="absolute top-0 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.2, 0.1],
+            }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-0 right-1/4 w-80 h-80 bg-white/10 rounded-full blur-3xl"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.15, 0.05, 0.15],
+            }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -115,4 +128,3 @@ export function FinalCTA() {
     </section>
   );
 }
-

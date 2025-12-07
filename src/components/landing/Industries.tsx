@@ -9,6 +9,7 @@ import {
   Car, 
   Headphones 
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const industries = [
   { icon: Briefcase, label: "Professional Services", gradient: "from-blue-500 to-indigo-500" },
@@ -32,19 +33,27 @@ const itemVariants = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.5 },
   },
 };
 
 export function Industries() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section className="py-24 md:py-32 bg-muted/30 relative overflow-hidden">
       {/* Background Elements */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-violet-500/10 rounded-full blur-3xl"
-        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {mounted && (
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-violet-500/10 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -83,13 +92,18 @@ export function Industries() {
                 className="group"
               >
                 <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: index * 0.2,
-                  }}
+                  // Only enable animation after mounting to prevent hydration issues
+                  animate={mounted ? { y: [0, -8, 0] } : {}}
+                  transition={
+                    mounted
+                      ? {
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: index * 0.2,
+                        }
+                      : {}
+                  }
                   className="flex flex-col items-center p-6 rounded-2xl backdrop-blur-xl bg-background/50 dark:bg-background/30 border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <div className={`p-4 rounded-xl bg-gradient-to-br ${industry.gradient} mb-4 group-hover:scale-110 transition-transform duration-300`}>
@@ -108,4 +122,3 @@ export function Industries() {
     </section>
   );
 }
-

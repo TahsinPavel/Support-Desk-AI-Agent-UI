@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const highlights = [
   "No hidden fees",
@@ -13,22 +14,32 @@ const highlights = [
 ];
 
 export function PricingTeaser() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section className="py-24 md:py-32 relative overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
       
       {/* Animated Gradient Orbs */}
-      <motion.div
-        className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-l from-indigo-500/20 to-violet-500/20 rounded-full blur-3xl"
-        animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl"
-        animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {mounted && (
+        <>
+          <motion.div
+            className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-l from-indigo-500/20 to-violet-500/20 rounded-full blur-3xl"
+            animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl"
+            animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -106,4 +117,3 @@ export function PricingTeaser() {
     </section>
   );
 }
-

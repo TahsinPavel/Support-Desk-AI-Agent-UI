@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-gray-50">
+      <body className="bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
