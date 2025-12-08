@@ -1,8 +1,10 @@
-import { OnboardingProvider } from "@/components/OnboardingProvider";
+"use client";
+
 import AuthGuard from "@/components/AuthGuard";
+import { OnboardingProvider } from "@/components/OnboardingProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
+export default function StepsLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGuard>
       <OnboardingProvider>

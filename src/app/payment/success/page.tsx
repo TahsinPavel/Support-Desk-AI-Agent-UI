@@ -49,6 +49,9 @@ export default function PaymentSuccessPage() {
           throw new Error('Failed to activate subscription');
         }
         
+        // Mark payment as complete in localStorage
+        localStorage.setItem("payment_complete", "true");
+        
         // Redirect to dashboard after successful activation
         setTimeout(() => {
           router.push('/dashboard');

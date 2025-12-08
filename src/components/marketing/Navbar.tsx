@@ -3,22 +3,17 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Sparkles } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Only render the toggle button after mounting to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
 
   // Render nothing on the server, and only render the actual button on the client
   if (!mounted) {
@@ -53,7 +48,7 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-3">
             {/* Placeholder for theme toggle to maintain layout */}
-            <div className="w-10 h-10" />
+            <div className="w-9 h-9" />
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
               <Link href="/auth/signin">Sign In</Link>
             </Button>
@@ -96,13 +91,7 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5 text-yellow-500" />
-            ) : (
-              <Moon className="h-5 w-5 text-gray-700" />
-            )}
-          </Button>
+          <ThemeToggle />
           <Button variant="ghost" asChild className="hidden sm:inline-flex">
             <Link href="/auth/signin">Sign In</Link>
           </Button>

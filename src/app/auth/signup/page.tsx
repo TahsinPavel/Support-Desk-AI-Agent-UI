@@ -15,7 +15,6 @@ function SignUpForm() {
   const plan = searchParams.get('plan') || 'starter';
 
   const [formData, setFormData] = useState({
-    name: "",
     businessName: "",
     email: "",
     password: "",
@@ -52,7 +51,6 @@ function SignUpForm() {
 
     try {
       const response = await signup({
-        name: formData.name,
         business_name: formData.businessName,
         email: formData.email,
         password: formData.password,
@@ -106,17 +104,6 @@ function SignUpForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
           <div className="space-y-2">
             <Label htmlFor="businessName">Business Name</Label>
             <Input

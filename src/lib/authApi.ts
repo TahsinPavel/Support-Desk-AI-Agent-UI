@@ -2,7 +2,6 @@ import axiosInstance from './axiosInstance';
 import { AUTH_ENDPOINTS } from './api';
 
 export interface SignupData {
-  name: string;
   business_name: string;
   email: string;
   password: string;
@@ -19,7 +18,6 @@ export interface AuthResponse {
   detail?: string;
   user?: {
     id: string;
-    name: string;
     email: string;
     business_name: string;
   };
@@ -30,7 +28,6 @@ export interface AuthResponse {
 
 export interface UserProfile {
   id: string;
-  name: string;
   email: string;
   business_name: string;
 }
@@ -38,6 +35,17 @@ export interface UserProfile {
 // Register a new tenant
 export const signup = async (data: SignupData): Promise<AuthResponse> => {
   const response = await axiosInstance.post(AUTH_ENDPOINTS.SIGNUP, data);
+  
+  // Store token if returned (check common token field names)
+  const token = response.data.token || response.data.access_token || response.data.accessToken;
+  if (token) {
+    localStorage.setItem('auth_token', token);
+    // Set cookie for middleware authentication (expires in 7 days)
+    document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+    // Set the token in axios defaults for future requests
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+  
   return response.data;
 };
 

@@ -1,7 +1,6 @@
 "use client";
 
-import { Moon, Sun, Bell, Search } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,9 +15,9 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { logout } from "@/lib/authApi";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Topbar() {
-  const { setTheme, theme } = useTheme();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -29,10 +28,6 @@ export function Topbar() {
   const handleLogout = async () => {
     await logout();
     router.push("/auth/signin");
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -60,16 +55,8 @@ export function Topbar() {
           <span className="sr-only">Notifications</span>
         </Button>
 
-        {/* Theme toggle - Simplified version like in Navbar */}
-        {mounted && (
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5 text-yellow-500" />
-            ) : (
-              <Moon className="h-5 w-5 text-gray-700" />
-            )}
-          </Button>
-        )}
+        {/* Theme toggle - Using our custom ThemeToggle component */}
+        {mounted && <ThemeToggle />}
 
         {/* User menu */}
         <DropdownMenu>
