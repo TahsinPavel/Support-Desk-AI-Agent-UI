@@ -1,10 +1,13 @@
 // Use /api proxy to avoid CORS issues (proxied to backend via next.config.ts rewrites)
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "development" ? "http://localhost:8000" : "");
 
 // Generic fetcher function for SWR
-export const fetcher = (url: string) => fetch(`${API_BASE_URL}${url}`, {
-  credentials: 'include',
-}).then((res) => res.json());
+export const fetcher = (url: string) =>
+  fetch(`${API_BASE_URL}${url}`, {
+    credentials: "include", // only if your backend uses cookies
+    headers: { "Content-Type": "application/json" },
+  }).then((res) => res.json());
 
 // Auth API endpoints
 export const AUTH_ENDPOINTS = {
