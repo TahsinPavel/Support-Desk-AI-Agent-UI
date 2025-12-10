@@ -44,10 +44,9 @@ export default function EmailThreadPage() {
       setIsSending(true);
       await sendEmail({
         tenant_id: tenantId,
-        channel_id: channelId,
-        to: data.to,
+        to_email: data.to,
         subject: data.subject,
-        body: data.body,
+        message: data.body,
       });
       
       // Reload thread to show new message
@@ -102,20 +101,22 @@ export default function EmailThreadPage() {
     );
   }
 
+  // For now, just display the first message in the thread
+  // A proper implementation would display all messages in the thread
+  const firstMessage = thread.messages[0];
+
   return (
     <div className="flex flex-col h-full">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Email Thread</h1>
-        <p className="text-gray-500">Conversation with {thread.messages[0]?.from_address}</p>
+        <p className="text-gray-500">Conversation with {firstMessage?.from_email}</p>
       </div>
 
       <Card className="flex-1 flex flex-col">
         <CardContent className="p-0 flex-1 flex h-[calc(100vh-200px)]">
-          <EmailThread 
-            thread={thread} 
-            onSendEmail={handleSendEmail}
-            isSending={isSending}
-          />
+          {firstMessage && (
+            <EmailThread email={firstMessage} />
+          )}
         </CardContent>
       </Card>
 

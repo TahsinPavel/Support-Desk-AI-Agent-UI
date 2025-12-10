@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +10,18 @@ import Link from "next/link";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
   
+  // Only access searchParams on the client side
+  const [token, setToken] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // This will only run on the client side
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      setToken(urlParams.get('token'));
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: ""
@@ -38,6 +47,11 @@ export default function ResetPasswordPage() {
       return;
     }
     
+    if (!token) {
+      setError("Invalid or missing reset token");
+      return;
+    }
+    
     setLoading(true);
     setError("");
     
@@ -59,6 +73,20 @@ export default function ResetPasswordPage() {
       setLoading(false);
     }
   };
+
+  if (token === null) {
+    // Still loading or token not available
+    return (
+      <Card className="rounded-2xl shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Loading...</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!token) {
     return (

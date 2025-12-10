@@ -1,7 +1,8 @@
 import axiosInstance from '@/lib/axiosInstance';
 import {
   EmailMessage,
-  SendEmailRequest
+  SendEmailRequest,
+  EmailThreadResponse
 } from '@/types/email';
 import { EMAIL_ENDPOINTS } from '@/lib/api';
 
@@ -26,6 +27,20 @@ export async function getEmails(): Promise<EmailMessage[]> {
     return [];
   } catch (error) {
     console.error('Error fetching emails:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch a specific email thread by ID
+ * GET /api/email/thread/{id}
+ */
+export async function fetchThread(threadId: string): Promise<EmailThreadResponse> {
+  try {
+    const response = await axiosInstance.get(EMAIL_ENDPOINTS.THREAD(threadId));
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching thread ${threadId}:`, error);
     throw error;
   }
 }

@@ -29,6 +29,7 @@ export const EMAIL_ENDPOINTS = {
   LIST: '/email/messages',
   SEND: '/email/send',
   RECEIVE: '/email/email/receive',
+  THREAD: (id: string) => `/email/thread/${id}`,
   SUMMARY: '/analytics/email/summary',
   DAILY: '/analytics/email/daily',
   TYPES: '/analytics/email/types',
