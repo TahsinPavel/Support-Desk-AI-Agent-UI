@@ -11,13 +11,13 @@ export interface PricingTier {
   yearlyPrice: number | null;
   priceLabel?: string;
   features: string[];
+  overages?: string[];
   resolutionCost?: string;
   popular?: boolean;
   enterprise?: boolean;
   comingSoon?: boolean;
   icon: "starter" | "growth" | "enterprise";
 }
-
 interface PricingCardProps {
   tier: PricingTier;
   isYearly: boolean;
@@ -41,6 +41,7 @@ export function PricingCard({ tier, isYearly, onCheckout, index }: PricingCardPr
   const Icon = icons[tier.icon];
   const gradient = gradients[tier.icon];
   const displayPrice = isYearly && tier.yearlyPrice ? tier.yearlyPrice : tier.price;
+  const yearlyTotal = tier.yearlyPrice ? tier.yearlyPrice * 12 : 0;
 
   return (
     <motion.div
@@ -69,60 +70,76 @@ export function PricingCard({ tier, isYearly, onCheckout, index }: PricingCardPr
       )}
 
       <div
-        className={`relative h-full p-8 rounded-3xl backdrop-blur-xl border transition-all duration-300 ${
+        className={`relative h-full p-8 rounded-3xl backdrop-blur-xl border transition-all duration-300 flex flex-col ${
           tier.popular
             ? "bg-background/80 border-indigo-500/50 shadow-2xl shadow-indigo-500/10"
-            : "bg-background/50 border-border/50 hover:border-border"
+            : tier.comingSoon
+            ? "bg-background/30 border-border/30 opacity-80"
+            : "bg-background/50 border-border/50 hover:border-border hover:shadow-lg"
         }`}
       >
         {/* Icon */}
-        <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${gradient} mb-6`}>
+        <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${gradient} mb-4`}>
           <Icon className="w-6 h-6 text-white" />
         </div>
 
         {/* Title & Description */}
-        <h3 className="text-2xl font-bold mb-6">{tier.name}</h3>
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
+          <p className={`text-sm ${tier.comingSoon ? "text-muted-foreground/70" : "text-muted-foreground"}`}>
+            {tier.description}
+          </p>
+        </div>
 
         {/* Price */}
         <div className="mb-6">
           {tier.comingSoon ? (
-            <div className="text-3xl font-bold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent">
-              Available Soon
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="text-2xl font-bold bg-gradient-to-r from-gray-400 to-gray-500 bg-clip-text text-transparent mb-2">
+                {tier.priceLabel}
+              </div>
+              <span className="text-xs text-muted-foreground">Stay tuned for updates</span>
             </div>
           ) : tier.price !== null ? (
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold">${displayPrice}</span>
-              <span className="text-muted-foreground">/month</span>
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-bold">${displayPrice}</span>
+                <span className="text-muted-foreground">/month</span>
+              </div>
+              {isYearly && tier.yearlyPrice && (
+                <p className="text-sm text-emerald-500 mt-1">
+                  Billed annually (${yearlyTotal}/year)
+                </p>
+              )}
             </div>
           ) : (
-            <div className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-              {tier.priceLabel || "Custom Pricing"}
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="text-2xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                {tier.priceLabel || "Custom Pricing"}
+              </div>
             </div>
-          )}
-          {!tier.comingSoon && isYearly && tier.yearlyPrice && (
-            <p className="text-sm text-emerald-500 mt-1">
-              Billed annually (${tier.yearlyPrice * 12}/year)
-            </p>
           )}
         </div>
 
         {/* CTA Button */}
-        <Button
-          onClick={onCheckout}
-          size="lg"
-          disabled={tier.comingSoon}
-          className={`w-full mb-8 ${
-            tier.comingSoon
-              ? "bg-muted text-muted-foreground cursor-not-allowed"
-              : tier.popular
-              ? `bg-gradient-to-r ${gradient} hover:opacity-90 shadow-lg shadow-indigo-500/25`
-              : tier.enterprise
-              ? `bg-gradient-to-r ${gradient} hover:opacity-90`
-              : "bg-foreground text-background hover:bg-foreground/90"
-          }`}
-        >
-          {tier.comingSoon ? "Coming Soon" : tier.enterprise ? "Contact Sales" : "Subscribe Now"}
-        </Button>
+        <div className="mt-auto">
+          <Button
+            onClick={onCheckout}
+            size="lg"
+            disabled={tier.comingSoon}
+            className={`w-full mb-8 ${
+              tier.comingSoon
+                ? "bg-muted text-muted-foreground cursor-not-allowed"
+                : tier.popular
+                ? `bg-gradient-to-r ${gradient} hover:opacity-90 shadow-lg shadow-indigo-500/25`
+                : tier.enterprise
+                ? `bg-gradient-to-r ${gradient} hover:opacity-90`
+                : "bg-foreground text-background hover:bg-foreground/90"
+            }`}
+          >
+            {tier.comingSoon ? "Coming Soon" : tier.enterprise ? "Contact Sales" : "Get Started"}
+          </Button>
+        </div>
 
         {/* Features */}
         <ul className="space-y-3">
@@ -131,12 +148,28 @@ export function PricingCard({ tier, isYearly, onCheckout, index }: PricingCardPr
               <div className={`mt-0.5 p-1 rounded-full bg-gradient-to-r ${gradient}`}>
                 <Check className="w-3 h-3 text-white" />
               </div>
-              <span className="text-sm text-muted-foreground">{feature}</span>
+              <span className={`text-sm ${tier.comingSoon ? "text-muted-foreground/70" : "text-muted-foreground"}`}>
+                {feature}
+              </span>
             </li>
           ))}
         </ul>
+
+        {/* Overages */}
+        {tier.overages && (
+          <div className="mt-6 pt-4 border-t border-border/50">
+            <h4 className="text-sm font-semibold mb-2 text-muted-foreground">Overages</h4>
+            <ul className="space-y-1">
+              {tier.overages.map((overage, i) => (
+                <li key={i} className="text-xs text-muted-foreground flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary/30"></div>
+                  {overage}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </motion.div>
   );
 }
-

@@ -7,8 +7,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
-import { PricingToggle, PricingCard, ComparisonTable, FAQ, type PricingTier } from "@/components/pricing";
-
+import { PricingToggle, PricingCard, ComparisonTable, FAQ, Testimonials, UsageBilling, type PricingTier } from "@/components/pricing";
 // Declare Paddle type for TypeScript
 declare global {
   interface Window {
@@ -23,64 +22,65 @@ declare global {
 
 const pricingTiers: PricingTier[] = [
   {
-    name: "Growth AI",
-    description: "",
-    price: null,
-    yearlyPrice: null,
-    priceLabel: "Available Soon",
-    icon: "growth",
-    comingSoon: true,
-    features: [
-      "Everything in Starter",
-      "CRM integrations (HubSpot, Salesforce, Pipedrive)",
-      "Workflow automation builder",
-      "Multi-language support",
-      "Custom knowledge bases (PDF, Notion, Web, Drive)",
-      "Advanced analytics dashboard",
-      "Multiple phone & email connectors",
-    ],
-  },
-  {
     name: "Starter AI",
-    description: "",
+    description: "Perfect for small businesses getting started with AI automation",
     price: 149,
     yearlyPrice: 119,
     icon: "starter",
     popular: true,
     features: [
-      "AI Chat, Email, SMS & Voice agent",
-      "Basic analytics",
-      "1 knowledge base source",
-      "Mobile-friendly inbox",
-      "1 phone number connector",
-      "1 support email connector",
-      "Unlimited inbound messages",
+      "24/7 AI Call Answering (100 included minutes)",
+      "24/7 AI Website Chatbot (unlimited)",
+      "24/7 AI SMS Assistant (200 included SMS)",
+      "24/7 AI Email Replies (unlimited)",
+      "CRM Sync",
+      "Appointment Scheduling",
+      "Lead Capture Automation",
+      "Basic Integrations",
+      "1 Location",
+    ],
+    overages: [
+      "Voice: $0.18/min",
+      "SMS: $0.03/msg"
+    ]
+  },
+  {
+    name: "Growth AI",
+    description: "For scaling teams needing advanced automation",
+    price: null,
+    yearlyPrice: null,
+    priceLabel: "🚀 Launching Soon",
+    icon: "growth",
+    comingSoon: true,
+    features: [
+      "All Starter features",
+      "500 included call minutes",
+      "1000 included SMS",
+      "Multi-location support",
+      "Team Inbox",
+      "Advanced Integrations",
+      "Workflow Automations",
     ],
   },
   {
     name: "Enterprise AI",
-    description: "",
+    description: "For large organizations with complex requirements",
     price: null,
     yearlyPrice: null,
-    priceLabel: "Available Soon",
+    priceLabel: "Custom",
     icon: "enterprise",
     enterprise: true,
     comingSoon: true,
     features: [
       "Everything in Growth",
-      "Custom LLM (GPT-4o / Gemini / Claude)",
-      "HIPAA/SOC-2 compliance features",
-      "IVR call routing",
-      "Call recording & voice intelligence",
-      "SSO (SAML/OKTA)",
-      "Dedicated account manager",
-      "Custom onboarding & training",
-      "SLA uptime guarantee",
+      "Unlimited minutes option",
+      "Priority Support",
+      "Dedicated Success Manager",
+      "Custom AI behavior tuning",
+      "SLA",
     ],
   },
-];
-
-// Price IDs for Paddle (replace with your actual price IDs)
+];// Price IDs for Paddle (replace with your actual price IDs)
 const priceIds = {
   starter: { monthly: "pri_starter_monthly", yearly: "pri_starter_yearly" },
   growth: { monthly: "pri_growth_monthly", yearly: "pri_growth_yearly" },
@@ -117,18 +117,13 @@ export default function PricingPage() {
       return;
     }
 
-    const tierKey = tier.icon as "starter" | "growth";
-    const priceId = isYearly ? priceIds[tierKey].yearly : priceIds[tierKey].monthly;
-
-    if (window.Paddle) {
-      window.Paddle.Checkout.open({
-        items: [{ priceId, quantity: 1 }],
-        ...(userEmail && { customer: { email: userEmail } }),
-      });
-    } else {
-      // Fallback: redirect to signup
-      router.push("/auth/signup");
+    if (tier.comingSoon) {
+      // Do nothing for coming soon plans
+      return;
     }
+
+    // Redirect to signup for the Starter plan
+    router.push("/auth/signup");
   };
 
   return (
@@ -163,20 +158,19 @@ export default function PricingPage() {
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                 <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  Powerful AI Support for{" "}
+                  Never Miss a Lead Again with{" "}
                 </span>
                 <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
-                  Modern Businesses
+                  24/7 AI Agents
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-                Scale support, automate workflows, and deliver instant customer responses with TogsTec AI.
+                Automate customer support, qualify leads, and boost conversions with our all-in-one AI platform. Start free, scale as you grow.
               </p>
               <PricingToggle isYearly={isYearly} onToggle={setIsYearly} />
             </motion.div>
           </div>
         </section>
-
         {/* Pricing Cards Section */}
         <section className="py-12 md:py-20">
           <div className="container mx-auto px-4">
@@ -215,9 +209,7 @@ export default function PricingPage() {
               <ComparisonTable />
             </div>
           </div>
-        </section>
-
-        {/* FAQ Section */}
+        </section>        {/* FAQ Section */}
         <section className="py-20 md:py-28">
           <div className="container mx-auto px-4">
             <motion.div
@@ -237,6 +229,12 @@ export default function PricingPage() {
             <FAQ />
           </div>
         </section>
+
+        {/* Testimonials Section */}
+        <Testimonials />
+
+        {/* Usage Billing Section */}
+        <UsageBilling />
 
         {/* Bottom CTA Section */}
         <section className="py-20 md:py-28 relative overflow-hidden">
@@ -268,10 +266,10 @@ export default function PricingPage() {
               className="text-center max-w-3xl mx-auto"
             >
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-                Ready to Transform Your Customer Support?
+                Start Automating Your Support Today
               </h2>
               <p className="text-lg md:text-xl text-white/80 mb-10">
-                Join thousands of businesses automating their support with AI.
+                Join thousands of businesses delivering instant, intelligent customer service with our AI platform.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -280,7 +278,7 @@ export default function PricingPage() {
                   className="text-base px-8 py-6 bg-white text-indigo-600 hover:bg-white/90 shadow-xl"
                 >
                   <a href="/auth/signup">
-                    Subscribe Now
+                    Start for $149/month
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                 </Button>
@@ -294,12 +292,11 @@ export default function PricingPage() {
                 </Button>
               </div>
               <p className="mt-6 text-white/60 text-sm">
-                No credit card required to get started.
+                No credit card required · 14-day free trial
               </p>
             </motion.div>
           </div>
-        </section>
-      </main>
+        </section>      </main>
       <Footer />
     </div>
   );

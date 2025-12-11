@@ -11,28 +11,24 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: "Can I switch plans later?",
-    answer: "Absolutely! You can upgrade or downgrade your plan at any time. When upgrading, you'll get immediate access to new features. When downgrading, changes take effect at your next billing cycle."
+    question: "How do overages work?",
+    answer: "Overages are billed at the end of each billing cycle. Voice calls are charged at $0.18 per minute and SMS messages at $0.03 per message. You'll only be charged for usage beyond your plan's included limits."
   },
   {
-    question: "What integrations are supported?",
-    answer: "We integrate with popular CRMs like HubSpot, Salesforce, and Pipedrive. Knowledge bases can pull from PDF documents, Notion, websites, and Google Drive. We also support custom API integrations for Enterprise plans."
+    question: "What happens if I reach my included minutes?",
+    answer: "Your service continues uninterrupted. You'll be charged for overages at the standard rates ($0.18/min for voice, $0.03/msg for SMS) which will appear on your next bill."
   },
   {
-    question: "Is my data secure?",
-    answer: "Yes! We take security seriously. All data is encrypted in transit and at rest. Enterprise plans include HIPAA and SOC-2 compliance features, SSO authentication, and dedicated security controls."
+    question: "Can I upgrade later?",
+    answer: "Yes, you can upgrade to a higher plan at any time. Upgrades take effect immediately, and you'll get access to additional features and higher usage limits right away."
   },
   {
-    question: "How does the AI learn about my business?",
-    answer: "You can train the AI using knowledge bases — upload documents, connect to Notion, or let it crawl your website. The AI learns your business context, terminology, and processes to provide accurate, personalized responses."
+    question: "Is there a contract?",
+    answer: "No, our Starter plan is month-to-month with no long-term commitment. You can cancel anytime. Enterprise plans may include custom contracts for additional features and support."
   },
   {
-    question: "What happens if the AI can't answer a question?",
-    answer: "When the AI encounters a complex query it can't handle, it seamlessly escalates to a human agent with full conversation context. You can also set custom escalation rules based on topics or keywords."
-  },
-  {
-    question: "Do you offer custom enterprise solutions?",
-    answer: "Yes! Our Enterprise plan is fully customizable. Contact our sales team to discuss custom LLM selection, advanced security requirements, dedicated infrastructure, custom onboarding, and volume pricing."
+    question: "Will Growth/Enterprise be available soon?",
+    answer: "Yes! We're actively developing the Growth and Enterprise plans with advanced features. Sign up for our newsletter to be notified when they become available."
   }
 ];
 
