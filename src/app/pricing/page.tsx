@@ -131,16 +131,16 @@ export default function PricingPage() {
       <Navbar />
       <main className="pt-16">
         {/* Hero Section */}
-        <section className="py-20 md:py-28 relative overflow-hidden">
+        <section className="py-16 md:py-20 lg:py-28 relative overflow-hidden">
           {/* Background effects */}
           <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent" />
           <motion.div
-            className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"
+            className="absolute top-20 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-indigo-500/10 rounded-full blur-3xl"
             animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 8, repeat: Infinity }}
           />
           <motion.div
-            className="absolute top-40 right-1/4 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl"
+            className="absolute top-40 right-1/4 w-56 h-56 md:w-80 md:h-80 bg-violet-500/10 rounded-full blur-3xl"
             animate={{ scale: [1.1, 1, 1.1], opacity: [0.5, 0.3, 0.5] }}
             transition={{ duration: 10, repeat: Infinity }}
           />
@@ -152,11 +152,11 @@ export default function PricingPage() {
               transition={{ duration: 0.6 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6">
-                <Sparkles className="w-4 h-4 text-indigo-500" />
-                <span className="text-sm font-medium text-indigo-500">Simple, transparent pricing</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-4 md:mb-6">
+                <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-indigo-500" />
+                <span className="text-xs md:text-sm font-medium text-indigo-500">Simple, transparent pricing</span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
                 <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                   Never Miss a Lead Again with{" "}
                 </span>
@@ -164,7 +164,7 @@ export default function PricingPage() {
                   24/7 AI Agents
                 </span>
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+              <p className="text-base md:text-lg text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto">
                 Automate customer support, qualify leads, and boost conversions with our all-in-one AI platform. Start free, scale as you grow.
               </p>
               <PricingToggle isYearly={isYearly} onToggle={setIsYearly} />
@@ -189,40 +189,42 @@ export default function PricingPage() {
         </section>
 
         {/* Comparison Table Section */}
-        <section className="py-20 md:py-28 bg-muted/30">
+        <section className="py-16 md:py-20 lg:py-28 bg-muted/30">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-12"
+              className="text-center mb-10 md:mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
                 Compare Plans
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm md:text-base text-muted-foreground max-w-xl md:max-w-2xl mx-auto">
                 Find the perfect plan for your business needs
               </p>
             </motion.div>
-            <div className="max-w-5xl mx-auto rounded-3xl border border-border/50 bg-background/50 backdrop-blur-sm p-6 md:p-8 overflow-hidden">
+            <div className="max-w-5xl mx-auto rounded-3xl border border-border/50 bg-background/50 backdrop-blur-sm p-4 md:p-6 lg:p-8 overflow-hidden">
               <ComparisonTable />
             </div>
           </div>
-        </section>        {/* FAQ Section */}
-        <section className="py-20 md:py-28">
+        </section>
+        
+        {/* FAQ Section */}
+        <section className="py-16 md:py-20 lg:py-28">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-12"
+              className="text-center mb-10 md:mb-12"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">
                 Frequently Asked Questions
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm md:text-base text-muted-foreground max-w-xl md:max-w-2xl mx-auto">
                 Everything you need to know about TogsTec AI
               </p>
             </motion.div>
@@ -237,7 +239,7 @@ export default function PricingPage() {
         <UsageBilling />
 
         {/* Bottom CTA Section */}
-        <section className="py-20 md:py-28 relative overflow-hidden">
+        <section className="py-16 md:py-20 lg:py-28 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600" />
           <motion.div
             className="absolute inset-0 opacity-30"
@@ -247,12 +249,12 @@ export default function PricingPage() {
             }}
           />
           <motion.div
-            className="absolute top-0 left-1/3 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            className="absolute top-0 left-1/3 w-64 h-64 md:w-96 md:h-96 bg-white/10 rounded-full blur-3xl"
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 6, repeat: Infinity }}
           />
           <motion.div
-            className="absolute bottom-0 right-1/3 w-80 h-80 bg-white/10 rounded-full blur-3xl"
+            className="absolute bottom-0 right-1/3 w-56 h-56 md:w-80 md:h-80 bg-white/10 rounded-full blur-3xl"
             animate={{ scale: [1.2, 1, 1.2] }}
             transition={{ duration: 8, repeat: Infinity }}
           />
@@ -265,33 +267,33 @@ export default function PricingPage() {
               transition={{ duration: 0.6 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6">
                 Start Automating Your Support Today
               </h2>
-              <p className="text-lg md:text-xl text-white/80 mb-10">
+              <p className="text-base md:text-lg text-white/80 mb-8 md:mb-10">
                 Join thousands of businesses delivering instant, intelligent customer service with our AI platform.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <Button
                   size="lg"
                   asChild
-                  className="text-base px-8 py-6 bg-white text-indigo-600 hover:bg-white/90 shadow-xl"
+                  className="text-sm md:text-base px-6 py-5 md:px-8 md:py-6 bg-white text-indigo-600 hover:bg-white/90 shadow-xl"
                 >
                   <a href="/auth/signup">
                     Start for $149/month
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                   </a>
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
                   asChild
-                  className="text-base px-8 py-6 bg-transparent border-white/30 text-white hover:bg-white/10"
+                  className="text-sm md:text-base px-6 py-5 md:px-8 md:py-6 bg-transparent border-white/30 text-white hover:bg-white/10"
                 >
                   <a href="/contact-sales">Talk to Sales</a>
                 </Button>
               </div>
-              <p className="mt-6 text-white/60 text-sm">
+              <p className="mt-4 md:mt-6 text-white/60 text-xs md:text-sm">
                 No credit card required · 14-day free trial
               </p>
             </motion.div>

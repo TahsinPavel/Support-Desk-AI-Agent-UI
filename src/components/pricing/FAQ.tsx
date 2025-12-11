@@ -43,7 +43,7 @@ export function FAQ() {
       transition={{ duration: 0.6 }}
       className="max-w-3xl mx-auto"
     >
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         {faqs.map((faq, index) => (
           <motion.div
             key={index}
@@ -55,15 +55,15 @@ export function FAQ() {
           >
             <button
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/30 transition-colors"
+              className="w-full flex items-center justify-between p-4 md:p-5 text-left hover:bg-muted/30 transition-colors"
             >
-              <span className="font-medium pr-4">{faq.question}</span>
+              <span className="font-medium pr-2 md:pr-4 text-sm md:text-base">{faq.question}</span>
               <motion.div
                 animate={{ rotate: openIndex === index ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
                 className="flex-shrink-0"
               >
-                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                <ChevronDown className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
               </motion.div>
             </button>
             <AnimatePresence>
@@ -74,7 +74,7 @@ export function FAQ() {
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="px-5 pb-5 text-muted-foreground leading-relaxed">
+                  <div className="px-4 md:px-5 pb-4 md:pb-5 text-muted-foreground text-sm md:text-base leading-relaxed">
                     {faq.answer}
                   </div>
                 </motion.div>
